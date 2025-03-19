@@ -1,0 +1,48 @@
+#include<stdio.h>
+
+void main() {
+    int i, k, n, temp;
+    float wt_avg, tat_avg;
+
+    printf("Enter no of processes:");
+    scanf("%d", &n);
+    int p[n], bt[n], su[n], wt[n], tat[n];
+    for (i = 0; i < n; i++) {
+        p[i] = i;
+        printf("Enter the BT for P%d:", i);
+        scanf("%d", &bt[i]);
+    }
+    for (i = 0; i < n; i++) {
+        printf("p[%d]:Q1 or Q2:",i);
+        scanf("%d", &su[i]);
+    }
+
+    for (i = 0; i < n; i++) {
+        for (k = i + 1; k < n; k++) {
+            if (su[i] > su[k]) {
+                temp = p[i]; p[i] = p[k]; p[k] = temp;
+                temp = bt[i]; bt[i] = bt[k]; bt[k] = temp;
+                temp = su[i]; su[i] = su[k]; su[k] = temp;
+            }
+        }
+    }
+
+    wt[0] = 0;
+    tat[0] = bt[0];
+    wt_avg = 0;
+    tat_avg = tat[0];
+
+    for (i = 1; i < n; i++) {
+        wt[i] = wt[i - 1] + bt[i - 1];
+        tat[i] = wt[i] + bt[i];
+        wt_avg += wt[i];
+        tat_avg += tat[i];
+    }
+
+    printf("\nP\tQ\tBT\tWT\tTAT");
+    for (i = 0; i < n; i++)
+        printf("\n%d\t%d\t%d\t%d\t%d", p[i], su[i], bt[i], wt[i], tat[i]);
+
+    printf("\navg waiting time is %f", wt_avg / n);
+    printf("\navg tat is %f", tat_avg / n);
+}
