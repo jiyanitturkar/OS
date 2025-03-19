@@ -1,0 +1,88 @@
+#include<stdio.h>
+void main() {
+    int i, k, n, temp, q, time_quantum;
+    float wt_avg, tat_avg;
+
+    printf("Enter no of processes:");
+    scanf("%d", &n);
+    int p[n], bt[n], su[n], wt[n], tat[n];
+    int remaining_bt[n];
+
+    for (i = 0; i < n; i++) {
+        p[i] = i;
+        printf("Enter the BT for P%d:", i);
+        scanf("%d", &bt[i]);
+        remaining_bt[i] = bt[i];
+    }
+
+    for (i = 0; i < n; i++) {
+        printf("p[%d]:Q1 (FCFS) or Q2 (RR):", i);
+        scanf("%d", &su[i]);
+    }
+
+    int fcfs_p[n], fcfs_bt[n], fcfs_count = 0;
+    int rr_p[n], rr_bt[n], rr_count = 0;
+
+    for (i = 0; i < n; i++) {
+        if (su[i] == 1) {
+            fcfs_p[fcfs_count] = p[i];
+            fcfs_bt[fcfs_count] = bt[i];
+            fcfs_count++;
+        } else if (su[i] == 2) {
+            rr_p[rr_count] = p[i];
+            rr_bt[rr_count] = bt[i];
+            rr_count++;
+        }
+    }
+
+    wt[0] = 0;
+    tat[0] = fcfs_bt[0];
+    wt_avg = 0;
+    tat_avg = tat[0];
+
+    for (i = 1; i < fcfs_count; i++) {
+        wt[i] = wt[i - 1] + fcfs_bt[i - 1];
+        tat[i] = wt[i] + fcfs_bt[i];
+        wt_avg += wt[i];
+        tat_avg += tat[i];
+    }
+
+    printf("Enter TQ for RR:");
+    scanf("%d", &time_quantum);
+
+    int rr_wt[n], rr_tat[n], rr_rem_bt[n];
+    for (i = 0; i < rr_count; i++) {
+        rr_rem_bt[i] = rr_bt[i];
+        rr_wt[i] = 0;
+        rr_tat[i] = 0;
+    }
+
+    int time = 0, remaining_processes = rr_count;
+    while (remaining_processes > 0) {
+        for (i = 0; i < rr_count; i++) {
+            if (rr_rem_bt[i] > 0) {
+                if (rr_rem_bt[i] > time_quantum) {
+                    time += time_quantum;
+                    rr_rem_bt[i] -= time_quantum;
+                } else {
+                    time += rr_rem_bt[i];
+                    rr_wt[i] = time - rr_bt[i];
+                    rr_tat[i] = rr_wt[i] + rr_bt[i];
+                    rr_rem_bt[i] = 0;
+                    remaining_processes--;
+                }
+            }
+        }
+    }
+
+    printf("\nP\tQ\tBT\tWT\tTAT");
+    for (i = 0; i < fcfs_count; i++) {
+        printf("\n%d\t1\t%d\t%d\t%d", fcfs_p[i], fcfs_bt[i], wt[i], tat[i]);
+    }
+    for (i = 0; i < rr_count; i++) {
+        printf("\n%d\t2\t%d\t%d\t%d", rr_p[i], rr_bt[i], rr_wt[i], rr_tat[i]);
+    }
+
+    printf("\navg waiting time is %f", wt_avg / n);
+    printf("\navg tat is %f", tat_avg / n);
+}
