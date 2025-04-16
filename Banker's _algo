@@ -1,0 +1,85 @@
+#include <stdio.h>
+#include <conio.h>
+
+void main() {
+    int available[5], allocated[10][5], need[10][5], instances[5], count = 0, max[10][5], process, i, j, n;
+    int safe[10], finish[10], work[5];
+
+    printf("Enter the number of processes: ");
+    scanf("%d", &process);
+    printf("Enter the number of resources: ");
+    scanf("%d", &n);
+
+    printf("Enter the maximum instances of each resource:\n");
+    for (i = 0; i < n; i++) {
+        printf("%c: ", (i + 97));
+        scanf("%d", &instances[i]);
+        available[i] = instances[i];
+    }
+
+    printf("Enter the Allocation matrix:\n");
+    for (i = 0; i < process; i++) {
+        printf("Process P[%d] Allocation: ", i);
+        for (j = 0; j < n; j++) {
+            scanf("%d", &allocated[i][j]);
+            available[j] -= allocated[i][j];
+        }
+    }
+
+    printf("Enter the Maximum Demand matrix:\n");
+    for (i = 0; i < process; i++) {
+        printf("Process P[%d] Maximum Demand: ", i);
+        for (j = 0; j < n; j++) {
+            scanf("%d", &max[i][j]);
+            need[i][j] = max[i][j] - allocated[i][j];
+        }
+    }
+
+    for (i = 0; i < process; i++) {
+        finish[i] = 0;
+    }
+
+    for (i = 0; i < n; i++) {
+        work[i] = available[i];
+    }
+
+    printf("\nBanker's Algorithm for Safe State Check:\n");
+    while (count < process) {
+        int flag = 0;
+
+        for (i = 0; i < process; i++) {
+            if (finish[i] == 0) {
+                int allocate = 1;
+
+                for (j = 0; j < n; j++) {
+                    if (need[i][j] > work[j]) {
+                        allocate = 0;
+                        break;
+                    }
+                }
+
+                if (allocate) {
+                    for (j = 0; j < n; j++) {
+                        work[j] += allocated[i][j];
+                    }
+                    finish[i] = 1;
+                    safe[count++] = i;
+                    flag = 1;
+                    break;
+                }
+            }
+        }
+
+        if (flag == 0) {
+            printf("\nSystem is in an unsafe state.\n");
+            return;
+        }
+    }
+
+    printf("\nSystem is in a safe state.\n");
+    printf("Safe Sequence: ");
+    for (i = 0; i < process; i++) {
+        printf("P[%d] ", safe[i]);
+    }
+    printf("\n");
+}
